@@ -113,7 +113,6 @@ runs:
           zlib \
           brotli \
           nghttp2 \
-          zstd \
           libidn2 \
           freetype \
           harfbuzz \
