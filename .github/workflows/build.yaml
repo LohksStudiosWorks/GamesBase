@@ -1,0 +1,113 @@
+name: Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.artifact }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: linux-x86_64
+          - os: windows-latest
+            artifact: windows-x86_64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Install Linux SDL development dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake ninja-build pkg-config git ca-certificates \
+            libasound2-dev libpulse-dev libpipewire-0.3-dev libjack-dev libsndio-dev \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev \
+            libxi-dev libxss-dev libxtst-dev libxinerama-dev libxv-dev \
+            libxxf86vm-dev libxrender-dev libxkbcommon-dev libxkbcommon-x11-dev \
+            libx11-xcb-dev libxcb-randr0-dev libxcb-shape0-dev libxcb-xfixes0-dev \
+            libxcb-xkb-dev libxcb-shm0-dev libxcb-sync-dev libxcb-dri3-dev \
+            libwayland-dev wayland-protocols libdecor-0-dev \
+            libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
+            libegl1-mesa-dev libvulkan-dev \
+            libdbus-1-dev libibus-1.0-dev libudev-dev libusb-1.0-0-dev \
+            libthai-dev libfribidi-dev liburing-dev
+
+      - name: Bootstrap vcpkg and install Windows SDL dependencies
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vcpkgRoot = Join-Path $env:RUNNER_TEMP 'vcpkg'
+          git clone --depth 1 https://github.com/microsoft/vcpkg.git $vcpkgRoot
+          & (Join-Path $vcpkgRoot 'bootstrap-vcpkg.bat') -disableMetrics
+          & (Join-Path $vcpkgRoot 'vcpkg.exe') install `
+            'libusb:x64-windows-static' `
+            'vulkan:x64-windows-static'
+          [System.IO.File]::AppendAllText(
+            $env:GITHUB_ENV,
+            "VCPKG_ROOT=$vcpkgRoot`n",
+            [System.Text.UTF8Encoding]::new($false)
+          )
+
+      - name: Configure (Linux)
+        if: runner.os != 'Windows'
+        run: >-
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+#          -DBASE_ENABLE_IPO=ON
+
+      - name: Build (Linux)
+        if: runner.os != 'Windows'
+        run: cmake --build build --config Release --parallel
+
+#      - name: Stage (Linux)
+#        if: runner.os != 'Windows'
+#        run: cmake --install build --config Release --prefix stage
+
+      - name: Package (Linux)
+        if: runner.os != 'Windows'
+        env:
+          ARTIFACT_NAME: ${{ matrix.artifact }}
+        run: tar -czf "${ARTIFACT_NAME}.tar.gz" -C build .
+
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cmake -S . -B build -G 'Visual Studio 17 2022' -A x64 `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET=x64-windows-static `
+            -DBASE_USE_STATIC_CRT=ON `
+            -DBASE_ENABLE_IPO=ON
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: cmake --build build --config Release --parallel
+
+#      - name: Stage (Windows)
+#        if: runner.os == 'Windows'
+#        run: cmake --install build --config Release --prefix stage
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        env:
+          ARTIFACT_NAME: ${{ matrix.artifact }}
+        shell: pwsh
+        run: Compress-Archive -Path 'build/*' -DestinationPath "$env:ARTIFACT_NAME.zip" -Force
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.*
+          if-no-files-found: error
+          retention-days: 14
