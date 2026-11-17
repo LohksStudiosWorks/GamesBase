@@ -94,43 +94,42 @@ runs:
     - name: Setup Windows MSVC
       uses: ilammy/msvc-dev-cmd@v1
       if: runner.os == 'Windows'
-
-    - name: Setup Windows
+      
+    - name: Setup Windows Dependencies (MSVC)
       if: runner.os == 'Windows'
-      shell: bash
+      shell: pwsh
       run: |
-        # VCPKG update and install of dependencies
-
-        export vcpkgRoot="$RUNNER_TEMP/vcpkg"
-        git clone --depth 1 https://github.com/microsoft/vcpkg.git "$vcpkgRoot"
-        "$vcpkgRoot/bootstrap-vcpkg.sh" -disableMetrics
-        "$vcpkgRoot/vcpkg" install --triplet x64-windows-static \
-          bzip2 \
-          libflac \
-          libusb \
-          vulkan \
-          zlib \
-          brotli \
-          nghttp2 \
-          zstd \
-          libidn2 \
-          freetype \
-          harfbuzz \
-          libpng \
-          libwebp \
-          tiff \
-          libjpeg-turbo \
-          libogg \
-          libpsl[libicu] \
-          libtheora \
-          libvorbis \
-          minimp3 \
-          openal-soft \
-          opus \
-          opusfile \
+        $vcpkgRoot = "$env:RUNNER_TEMP\vcpkg"
+        git clone --depth 1 https://github.com/microsoft/vcpkg.git $vcpkgRoot
+        & "$vcpkgRoot\bootstrap-vcpkg.bat" -disableMetrics
+        
+        & "$vcpkgRoot\vcpkg" install --triplet x64-windows-static `
+          bzip2 `
+          libflac `
+          libusb `
+          vulkan `
+          zlib `
+          brotli `
+          nghttp2 `
+          zstd `
+          libidn2 `
+          freetype `
+          harfbuzz `
+          libpng `
+          libwebp `
+          tiff `
+          libjpeg-turbo `
+          libogg `
+          "libpsl[libicu]" `
+          libtheora `
+          libvorbis `
+          minimp3 `
+          openal-soft `
+          opus `
+          opusfile `
           directxsdk
 
-        echo "VCPKG_ROOT=$vcpkgRoot" >> $GITHUB_ENV
+        echo "VCPKG_ROOT=$vcpkgRoot" >> $env:GITHUB_ENV
         choco install ninja --no-progress
 
     - name: Set up Python
