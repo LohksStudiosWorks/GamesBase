@@ -4,6 +4,8 @@
 #include <thread>
 #include <chrono>
 
+#include <httplib.h>
+
 bool http_get(const char *hostname, Uint16 port, const char *path) {
     // 1. Resolve hostname
     NET_Address *address = NET_ResolveHostname(hostname);
@@ -74,5 +76,45 @@ bool http_get(const char *hostname, Uint16 port, const char *path) {
 
     // 6. Cleanup
     NET_DestroyStreamSocket(sock);
+    return true;
+}
+
+bool http_get_cpphttplib(const char* hostname, const char* path) {
+    httplib::Client cli(hostname);
+    cli.set_follow_location(true);
+    auto res = cli.Get(path);
+
+    if (!res) {
+        const auto err = res.error();
+
+        switch (err) {
+            case httplib::Error::SSLConnection:
+                std::cout << "SSL connection failed, SSL error: "
+                        << res.ssl_error() << std::endl;
+            break;
+
+            case httplib::Error::SSLLoadingCerts:
+                std::cout << "SSL cert loading failed, backend error: "
+                        << std::hex << res.ssl_backend_error() << std::endl;
+            break;
+
+            case httplib::Error::SSLServerVerification:
+                std::cout << "SSL verification failed, verify error: "
+                        << res.ssl_backend_error() << std::endl;
+            break;
+
+            case httplib::Error::SSLServerHostnameVerification:
+                std::cout << "SSL hostname verification failed, verify error: "
+                        << res.ssl_backend_error() << std::endl;
+            break;
+
+            default:
+                std::cout << "HTTP error: " << httplib::to_string(err) << std::endl;
+                break;
+        }
+        return false;
+    }
+
+    printf("\n%s\n", res->body.c_str());
     return true;
 }
