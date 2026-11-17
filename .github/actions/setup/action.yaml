@@ -82,6 +82,15 @@ runs:
   # >> Windows
   # ------------------------------
 
+    - name: Cache vcpkg artifacts
+      uses: actions/cache@v6
+      with:
+        path: |
+          ${{ github.workspace }}/vcpkg
+        key: vcpkg-${{ runner.os }}-
+        restore-keys: |
+          vcpkg-${{ runner.os }}-
+
     - name: Setup Windows MSVC
       uses: ilammy/msvc-dev-cmd@v1
       if: runner.os == 'Windows'
