@@ -94,12 +94,18 @@ runs:
     - name: Setup Windows MSVC
       uses: ilammy/msvc-dev-cmd@v1
       if: runner.os == 'Windows'
-      
+
     - name: Setup Windows Dependencies (MSVC)
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
+        # Clear the pre-installed Visual Studio vcpkg root path to prevent conflicts
+        Remove-Item Env:\VCPKG_ROOT -ErrorAction SilentlyContinue
+
         $vcpkgRoot = "$env:RUNNER_TEMP\vcpkg"
+        echo "VCPKG_ROOT=$vcpkgRoot" >> $env:GITHUB_ENV
+        $env:VCPKG_ROOT = $vcpkgRoot
+
         git clone --depth 1 https://github.com/microsoft/vcpkg.git $vcpkgRoot
         & "$vcpkgRoot\bootstrap-vcpkg.bat" -disableMetrics
         
