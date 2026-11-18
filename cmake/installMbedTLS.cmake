@@ -11,10 +11,7 @@ set(ENABLE_TESTING OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
     mbedtls
-    GIT_REPOSITORY https://github.com/Mbed-TLS/mbedtls.git
-    GIT_TAG v4.2.0
-    GIT_SHALLOW TRUE
-    GIT_SUBMODULES_RECURSE TRUE
+    URL https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-4.3.0/mbedtls-4.3.0.tar.bz2
 )
 
 FetchContent_MakeAvailable(mbedtls)
@@ -26,6 +23,5 @@ foreach(target mbedtls mbedx509 tfpsacrypto)
         )
     endif()
 endforeach()
-
 
 message(STATUS "Fetching of MbedTLS done!")
