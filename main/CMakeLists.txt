@@ -11,3 +11,8 @@ add_executable(${MAIN_PROJECT} WIN32 ${MAIN_SOURCES})
 target_include_directories(${MAIN_PROJECT} PUBLIC "include")
 
 target_link_libraries(${MAIN_PROJECT} PRIVATE ${CORE_LIB})
+
+set_target_properties(${MAIN_PROJECT}
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
