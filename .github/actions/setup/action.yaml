@@ -87,7 +87,7 @@ runs:
       if: runner.os == 'Windows'
       with:
         path: |
-          ${{ env.VCPKG_INSTALLATION_ROOT }}/installed
+          ${{ env.RUNNER_TEMP }}/vcpkg/installed
         key: vcpkg-${{ runner.os }}-
         restore-keys: |
           vcpkg-${{ runner.os }}-
