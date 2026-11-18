@@ -35,23 +35,9 @@ jobs:
       - name: CMake configure and build
         uses: $/.github/actions/compile
 
-      - name: Package (Linux and macOS)
-        if: runner.os != 'Windows'
-        env:
-          ARTIFACT_NAME: ${{ matrix.artifact }}
-        run: tar -czf "${ARTIFACT_NAME}.tar.gz" -C build .
-
-      - name: Package (Windows)
-        if: runner.os == 'Windows'
-        env:
-          ARTIFACT_NAME: ${{ matrix.artifact }}
-        shell: pwsh
-        run: Compress-Archive -Path 'build/*' -DestinationPath "$env:ARTIFACT_NAME.zip" -Force
-
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
-          path: ${{ matrix.artifact }}.*
-          if-no-files-found: error
-          retention-days: 14
+          path: |
+            build/*
