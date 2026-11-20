@@ -33,7 +33,7 @@ include(cmake/tools.cmake)
 # >> Library setup!
 
 file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
-    ${CMAKE_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
 
 add_library(SDL3Plus STATIC ${CORE_SOURCES})
