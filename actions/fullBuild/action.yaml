@@ -82,7 +82,8 @@ runs:
           libusb-1.0-0-dev \
           libthai-dev \
           libfribidi-dev \
-          liburing-dev
+          liburing-dev \
+          imagemagick
 
   # ------------------------------
   # >> macOS
@@ -146,8 +147,7 @@ runs:
           minimp3 \
           openal-soft \
           opus \
-          opusfile \
-          directxsdk
+          opusfile
 
         echo "VCPKG_ROOT=$vcpkgRoot" >> $GITHUB_ENV
         choco install ninja --no-progress
@@ -251,21 +251,32 @@ runs:
 
     - name: CMake configure
       shell: bash
+      env:
+        ANDROID_ENABLED: ${{ steps.android.outputs.enabled == '1' && 'ON' || 'OFF' }}
       run: |
-        # Setting up CMake and doing first config
+        set -euo pipefail
 
-        EXTRA_ARGS=""
-        VCPKG_CMAKE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
+        CMAKE_ARGS=(
+            -S .
+            -B build
+            -G Ninja
+            -DCMAKE_BUILD_TYPE=Release
+            "-DSDL3PLUS_ENABLE_ANDROID=$ANDROID_ENABLED"
+        )
 
-        if [ -f "$VCPKG_CMAKE" ]; then
-          EXTRA_ARGS="-DCMAKE_TOOLCHAIN_FILE=$VCPKG_CMAKE -DVCPKG_TARGET_TRIPLET=x64-windows-static"
-          echo "Enabled VCPKG correctly"
+        VCPKG_CMAKE="${VCPKG_ROOT:-}/scripts/buildsystems/vcpkg.cmake"
+
+        if [[ -n "${VCPKG_ROOT:-}" && -f "$VCPKG_CMAKE" ]]; then
+            CMAKE_ARGS+=(
+                "-DCMAKE_TOOLCHAIN_FILE=$VCPKG_CMAKE"
+                "-DVCPKG_TARGET_TRIPLET=x64-windows-static"
+            )
+            echo "Enabled VCPKG correctly"
         else
-          echo "No VCPKG config found!"
+            echo "No VCPKG config found!"
         fi
 
-        cmake -S . -B build -G Ninja \
-          -DCMAKE_BUILD_TYPE=Release $EXTRA_ARGS
+        cmake "${CMAKE_ARGS[@]}"
 
   # ------------------------------
   # >> CMake build
