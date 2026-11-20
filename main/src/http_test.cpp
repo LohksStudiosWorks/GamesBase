@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include <httplib.h>
+#include <SDL3_plus/SDL3_plus.hpp>
 
 bool http_get(const char *hostname, Uint16 port, const char *path) {
     // 1. Resolve hostname
@@ -82,6 +83,7 @@ bool http_get(const char *hostname, Uint16 port, const char *path) {
 bool http_get_cpphttplib(const char* hostname, const char* path) {
     httplib::Client cli(hostname);
     cli.set_follow_location(true);
+    SDL3_plus::apply_ca_certificate_on(cli);
     auto res = cli.Get(path);
 
     if (!res) {

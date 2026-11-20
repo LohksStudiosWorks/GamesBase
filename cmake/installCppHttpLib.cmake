@@ -1,13 +1,10 @@
-# Setup dependency
-
-include(FetchContent)
-
 if (NOT SDL3PLUS_ENABLE_HTTP)
     message(STATUS "Skipping CppHttpLib/MbedTLS: it was not enabled.")
     return()
 endif()
 
 include(cmake/auto/installMbedTLS.cmake)
+include(cmake/auto/updateCertificates.cmake)
 
 message(STATUS "Fetching CppHttpLib")
 

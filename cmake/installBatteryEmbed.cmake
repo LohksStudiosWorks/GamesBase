@@ -1,12 +1,3 @@
-# Setup dependency
-
-include(FetchContent)
-
-if (NOT SDL3PLUS_ENABLE_EMBED)
-    message(STATUS "Skipping BatteryEmbed: it was not enabled.")
-    return()
-endif()
-
 message(STATUS "Fetching BatteryEmbed")
 
 set(B_PRODUCTION_MODE ON)

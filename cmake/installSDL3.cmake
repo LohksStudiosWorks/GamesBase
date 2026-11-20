@@ -1,16 +1,10 @@
-include(FetchContent)
-
-if(NOT SDL3PLUS_ENABLE_GRAPHICS
-   AND NOT SDL3PLUS_ENABLE_AUDIO
-   AND NOT SDL3PLUS_ENABLE_SOCKETS)
-
+if(NOT SDL3PLUS_ENABLE_GRAPHICS AND NOT SDL3PLUS_ENABLE_AUDIO AND NOT SDL3PLUS_ENABLE_SOCKETS)
     message(STATUS "Skipping SDL3: it was not enabled.")
     return()
 endif()
 
 message(STATUS "Declaring SDL3 and dependencies...")
 
-# Declare SDL3
 FetchContent_Declare(
     SDL3
     GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
@@ -53,6 +47,7 @@ set(SDLIMAGE_VENDORED ON CACHE BOOL "" FORCE)
 set(SDLTTF_VENDORED ON CACHE BOOL "" FORCE)
 
 message(STATUS "Making SDL3 available...")
+
 FetchContent_MakeAvailable(SDL3)
 
 if(SDL3PLUS_ENABLE_GRAPHICS)
