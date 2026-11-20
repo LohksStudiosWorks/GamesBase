@@ -2,6 +2,11 @@
 
 include(FetchContent)
 
+if (NOT SDL3PLUS_ENABLE_JSON)
+    message(STATUS "Skipping JSON: it was not enabled.")
+    return()
+endif()
+
 message(STATUS "Fetching JSON")
 
 FetchContent_Declare(

@@ -1,3 +1,13 @@
 build/
 dumb/
 build-release/
+
+.cxx/
+android-project/.gradle/file-system.probe
+android-project/.gradle/8.12/executionHistory/
+android-project/.gradle/*/fileHashes/
+android-project/.gradle/*/fileChanges/
+android-project/.gradle/buildOutputCleanup/
+android-project/.gradle/*/checksums/
+android-project/.gradle/8.12/checksums/checksums.lock
+android-project/release-key.jks

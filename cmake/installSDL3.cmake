@@ -1,12 +1,20 @@
 include(FetchContent)
 
+if(NOT SDL3PLUS_ENABLE_GRAPHICS
+   AND NOT SDL3PLUS_ENABLE_AUDIO
+   AND NOT SDL3PLUS_ENABLE_SOCKETS)
+
+    message(STATUS "Skipping SDL3: it was not enabled.")
+    return()
+endif()
+
 message(STATUS "Declaring SDL3 and dependencies...")
 
 # Declare SDL3
 FetchContent_Declare(
-  SDL3
-  GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-  GIT_TAG        release-3.4.20
+    SDL3
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+    GIT_TAG        release-3.4.20
 )
 FetchContent_Declare(
     SDL3_image
@@ -35,8 +43,8 @@ if(ANDROID)
     set(SDL_SHARED ON CACHE BOOL "" FORCE)
     set(SDL_STATIC OFF CACHE BOOL "" FORCE)
 else()
-    set(SDL_STATIC ON CACHE BOOL "" FORCE)
     set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+    set(SDL_STATIC ON CACHE BOOL "" FORCE)
 endif()
 
 set(SDL_TESTS OFF CACHE BOOL "" FORCE)
@@ -44,20 +52,29 @@ set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(SDLIMAGE_VENDORED ON CACHE BOOL "" FORCE)
 set(SDLTTF_VENDORED ON CACHE BOOL "" FORCE)
 
-set(SDLIMAGE_AVIF OFF CACHE BOOL "" FORCE)
-set(SDLIMAGE_JXL OFF CACHE BOOL "" FORCE)
-set(SDLIMAGE_TIFF OFF CACHE BOOL "" FORCE)
-set(SDLIMAGE_WEBP OFF CACHE BOOL "" FORCE)
-
 message(STATUS "Making SDL3 available...")
 FetchContent_MakeAvailable(SDL3)
-message(STATUS "Making SDL3_image available...")
-FetchContent_MakeAvailable(SDL3_image)
-message(STATUS "Making SDL3_ttf available...")
-FetchContent_MakeAvailable(SDL3_ttf)
-message(STATUS "Making SDL3_mixer available...")
-FetchContent_MakeAvailable(SDL3_mixer)
-message(STATUS "Making SDL_net available...")
-FetchContent_MakeAvailable(SDL_net)
+
+if(SDL3PLUS_ENABLE_GRAPHICS)
+    set(SDLIMAGE_AVIF OFF CACHE BOOL "" FORCE)
+    set(SDLIMAGE_JXL OFF CACHE BOOL "" FORCE)
+    set(SDLIMAGE_TIFF OFF CACHE BOOL "" FORCE)
+    set(SDLIMAGE_WEBP OFF CACHE BOOL "" FORCE)
+    
+    message(STATUS "Making SDL3_image available...")
+    FetchContent_MakeAvailable(SDL3_image)
+    message(STATUS "Making SDL3_ttf available...")
+    FetchContent_MakeAvailable(SDL3_ttf)
+endif()
+
+if(SDL3PLUS_ENABLE_AUDIO)
+    message(STATUS "Making SDL3_mixer available...")
+    FetchContent_MakeAvailable(SDL3_mixer)
+endif()
+
+if(SDL3PLUS_ENABLE_SOCKETS)
+    message(STATUS "Making SDL_net available...")
+    FetchContent_MakeAvailable(SDL_net)
+endif()
 
 message(STATUS "SDL3 is complete.")

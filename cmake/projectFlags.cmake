@@ -9,5 +9,5 @@ set(BUILD_SHARED_LIBS OFF)
 
 
 if (MINGW)
-    include(cmake/fixMinGW.cmake)
+    include(cmake/auto/fixMinGW.cmake)
 endif()

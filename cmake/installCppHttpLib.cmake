@@ -2,9 +2,12 @@
 
 include(FetchContent)
 
-if(NOT TARGET mbedtls)
-    include(cmake/installMbedTLS.cmake)
+if (NOT SDL3PLUS_ENABLE_HTTP)
+    message(STATUS "Skipping CppHttpLib/MbedTLS: it was not enabled.")
+    return()
 endif()
+
+include(cmake/auto/installMbedTLS.cmake)
 
 message(STATUS "Fetching CppHttpLib")
 
@@ -28,6 +31,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(httplib)
 
-include(cmake/integrateCppHttpLib.cmake)
+include(cmake/auto/integrateCppHttpLib.cmake)
 
 message(STATUS "Fetching of CppHttpLib done!")
