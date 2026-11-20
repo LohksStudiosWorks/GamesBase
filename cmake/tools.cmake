@@ -82,7 +82,7 @@ function(sdl3plus_setup_android TARGET_NAME)
     )
 
     set(SDL3PLUS_ANDROID_TARGET "${TARGET_NAME}")
-    set(GAME_CMAKE_PROJECT "${CMAKE_CURRENT_SOURCE_DIR}/../CMakeLists.txt")
+    set(GAME_CMAKE_PROJECT "${CMAKE_SOURCE_DIR}/CMakeLists.txt")
 
     configure_file(
         "${SDL3PLUS_ANDROID_TEMPLATE_DIR}/app/build.gradle.in"
