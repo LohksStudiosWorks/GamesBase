@@ -215,7 +215,6 @@ runs:
       with:
         distribution: 'temurin'
         java-version: '21'
-        cache: 'gradle'
 
     - name: Install Android NDK (Linux)
       if: runner.os == 'Linux' && steps.android.outputs.enabled == '1'
