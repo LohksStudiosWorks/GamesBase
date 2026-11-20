@@ -69,6 +69,18 @@ endif()
 
 if(SDL3PLUS_ENABLE_HTTP)
     list(APPEND SDL3PLUS_LIBRARIES httplib::httplib)
+
+    file(RELATIVE_PATH SDL3PLUS_CERTIFICATE_RELATIVE
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CERTIFICATE_FILE}"
+    )
+
+    b_embed(SDL3Plus "${SDL3PLUS_CERTIFICATE_RELATIVE}")
+    message(STATUS "Integrated certificate: ${SDL3PLUS_CERTIFICATE_RELATIVE}")
+
+    target_compile_definitions(SDL3Plus PRIVATE
+        SDL3PLUS_CERTIFICATE_KEY="${SDL3PLUS_CERTIFICATE_RELATIVE}"
+    )
 endif()
 
 if(SDL3PLUS_ENABLE_JSON)
@@ -79,17 +91,6 @@ target_link_libraries(SDL3Plus PUBLIC ${SDL3PLUS_LIBRARIES})
 
 
 # >> Certificates, flags, and automation!
-
-file(RELATIVE_PATH SDL3PLUS_CERTIFICATE_RELATIVE
-    "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${CMAKE_BINARY_DIR}/_sdl3plus/certificates/mozilla_certificate.pem"
-)
-
-b_embed(SDL3Plus "${SDL3PLUS_CERTIFICATE_RELATIVE}")
-
-target_compile_definitions(SDL3Plus PRIVATE
-    SDL3PLUS_CERTIFICATE_KEY="${SDL3PLUS_CERTIFICATE_RELATIVE}"
-)
 
 configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/include/SDL3_plus/flags/flags.hpp.in"

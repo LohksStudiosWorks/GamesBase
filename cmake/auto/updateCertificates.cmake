@@ -1,13 +1,9 @@
-if(NOT DEFINED PROJECT_SOURCE_DIR)
-    message(FATAL_ERROR "PROJECT_SOURCE_DIR was not provided.")
-endif()
-
 set(CERTIFICATE_URL
     "https://curl.se/ca/cacert.pem"
 )
 
 set(CERTIFICATE_DIR
-    "${CMAKE_BINARY_DIR}/_sdl3plus/certificates"
+    "${CMAKE_CURRENT_SOURCE_DIR}/generated/certificates"
 )
 
 set(CERTIFICATE_FILE
@@ -19,7 +15,7 @@ set(TEMP_FILE
 )
 
 if(EXISTS "${CERTIFICATE_FILE}")
-    message(STATUS "Skipping download of Mozilla CA certificates (file already exists).")
+    message(STATUS "Skipping download of Mozilla CA certificates (file already exists: ${CERTIFICATE_FILE}).")
     return()
 endif()
 
